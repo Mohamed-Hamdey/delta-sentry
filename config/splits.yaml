@@ -1,0 +1,10 @@
+# D-003: time split. Frozen before any training. Do not change after this line.
+years:
+  train: [2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023]
+  validation: [2024]
+  test: [2025]
+
+notes: >
+  Four training years, one validation year, one held-out test year.
+  Test is scored exactly once, after all model and threshold choices on validation.
+  Spatial generalisation is not tested (stated limitation in results.md).

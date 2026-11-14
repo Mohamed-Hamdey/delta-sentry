@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Delta Sentry — Nile Delta Agricultural Early Warning</title>
+<meta name="description" content="30 m vegetation anomaly forecasting for the Nile Delta. NASA HLS + Prithvi-EO-2.0.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Serif:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="limb" aria-hidden="true"></div>
+
+  <canvas id="stars" aria-hidden="true"></canvas>
+
+
+
+<!-- ============================== TOP BAR ============================== -->
+<header class="topbar">
+  <div class="tb-left">
+    <span class="mark" aria-hidden="true"></span>
+    <span class="brand">DELTA SENTRY</span>
+    <span class="tb-sep"></span>
+    <span class="tb-place">Nile Delta · Egypt</span>
+  </div>
+  <nav class="mb-steps" aria-label="Sections">
+    <button data-jump="hero">00 · Brief</button>
+    <button data-jump="stage">01 · Watch Floor</button>
+    <button data-jump="trymodel">02 · Try Model</button>
+    <button data-jump="deepdive">03 · Evidence Room</button>
+  </nav>
+</header>
+
+<!-- ============================== 00 · BRIEF ============================== -->
+<section id="hero" class="brief">
+
+  <div class="hero-grid">
+    <div class="hero-copy">
+      <p class="eyebrow">NASA Space Apps 2026 · Cairo · Earth System Trend Detective</p>
+      <h1>The Nile Delta is changing.<br><span>We see it first.</span></h1>
+      <p class="deck">
+        Delta Sentry fuses 30 m NASA HLS satellite imagery with the Prithvi-EO foundation model to
+        forecast crop health one month ahead — then converts the result into a ranked field-inspection
+        worklist a Ministry office can act on before losses become compensation claims.
+      </p>
+      <div class="hero-actions">
+        <button class="btn btn-primary" data-jump="stage">Inspect active patches <span aria-hidden="true">↓</span></button>
+        <button class="btn btn-ghost" data-jump="deepdive">Open evidence room <span aria-hidden="true">↓</span></button>
+      </div>
+      <p class="scope">
+        <strong>Pilot tile.</strong> 3.8 × 3.1 km · 11.7 km² of cropland analysed · 2,100 such tiles cover the Delta.
+        <a href="#deepdive" data-jump="deepdive">Scope &amp; limits</a>
+      </p>
+    </div>
+
+    <aside class="locator" aria-label="Area of interest locator">
+      <div class="loc-head">
+        <span>AOI locator · Northern Delta</span>
+        <span class="mono" id="locatorCoords">31.2862°N, 30.7402°E</span>
+      </div>
+      <svg viewBox="0 0 300 172" class="loc-svg" role="img" aria-label="Nile Delta with the studied tile marked">
+        <defs>
+          <linearGradient id="deltaFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#16324f" stop-opacity=".85"/>
+            <stop offset="1" stop-color="#0b1728" stop-opacity=".65"/>
+          </linearGradient>
+        </defs>
+        <!-- Mediterranean coast -->
+        <path d="M38 40 Q150 22 262 40" class="coast"/>
+        <text x="150" y="16" class="loc-water">MEDITERRANEAN SEA</text>
+        <!-- delta fan -->
+        <path d="M150 160 L74 48 L150 66 L226 48 Z" fill="url(#deltaFill)" stroke="#2b5a86" stroke-width="1"/>
+        <!-- Nile branches -->
+        <path d="M150 160 L116 62" class="branch"/>
+        <path d="M150 160 L186 62" class="branch"/>
+        <path d="M150 162 L150 186" class="branch"/>
+        <!-- AOI box, matches main.js pin maths: 142..222 x 70..120 -->
+        <rect x="142" y="70" width="80" height="50" class="aoi-box" rx="1.5"/>
+        <text x="146" y="66" class="loc-aoi">PRITHVI 30 M AOI</text>
+        <!-- pin -->
+        <g id="aoiPin" transform="translate(182,95)">
+          <circle r="9" class="pin-halo"/>
+          <circle r="3.4" class="pin-dot"/>
+        </g>
+        <!-- place labels -->
+        <text x="52" y="80" class="loc-place">Kafr El-Sheikh</text>
+        <text x="26" y="104" class="loc-place dim">Damanhour</text>
+        <text x="232" y="104" class="loc-place">Mansoura</text>
+        <text x="150" y="170" class="loc-water" text-anchor="middle">DELTA APEX</text>
+      </svg>
+      <div class="loc-foot">
+        <span id="locatorPatchLabel">Active: —</span>
+        <span class="mono">UTM 36N</span>
+      </div>
+    </aside>
+  </div>
+
+  <!-- VERDICT BAR -->
+  <div class="verdict" aria-live="polite">
+    <div class="verdict-main">
+      <div class="verdict-date" id="verdictDate">—</div>
+      <h2 class="verdict-headline" id="verdictHeadline">Loading…</h2>
+      <p class="verdict-sub" id="verdictSub"></p>
+    </div>
+    <div class="verdict-ctl">
+      <label for="calibrationSelect">Operating threshold</label>
+      <select id="calibrationSelect">
+        <option value="top5" selected>Top 5% deficit (calibrated)</option>
+        <option value="top10">Top 10% deficit</option>
+        <option value="raw">All raw flags (−0.10)</option>
+      </select>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== 01 · WATCH FLOOR ============================== -->
+<section id="stage" class="watchfloor">
+  <header class="sec-head">
+    <div class="sec-num">01</div>
+    <div>
+      <h2>Watch Floor</h2>
+      <p class="sec-deck">
+        Step through what HLS observed, what Prithvi expected, and the contiguous field patches
+        that require a visit. Every square is a real 30 m decision.
+      </p>
+    </div>
+  </header>
+
+  <div class="floor-grid">
+
+    <!-- map -->
+    <div class="card mapcard">
+      <div class="card-top">
+        <span class="badge" id="stateBadge">STATE 01 · HLS satellite observed</span>
+        <span class="place-badge" id="activePlaceBadge">—</span>
+      </div>
+
+      <div class="stage-tabs" role="tablist" aria-label="Map state">
+        <button class="stage-tab" data-stage="observe" aria-pressed="true">01 Observed <small>HLS</small></button>
+        <button class="stage-tab" data-stage="forecast" aria-pressed="false">02 Forecast ghost <small>Prithvi</small></button>
+        <button class="stage-tab" data-stage="alert" aria-pressed="false">03 Gap ignites <small>deficit</small></button>
+      </div>
+
+      <div class="canvas-wrap">
+        <canvas id="cvUnified" aria-label="30 m NDVI map of the studied tile"></canvas>
+        <div class="scan" id="scanUnified" aria-hidden="true"></div>
+        <div id="map-tooltip" class="map-tooltip" role="tooltip"></div>
+      </div>
+
+      <div class="legend" id="unifiedLegend"></div>
+
+      <div class="timeline">
+        <button class="btn btn-small" id="playBtn">▶ Play season</button>
+        <div class="bars" id="bars" aria-hidden="true"></div>
+        <div class="tl-label">
+          <span class="mono" id="timeLabel">—</span>
+        </div>
+        <input type="range" id="timeSlider" min="0" max="11" step="1" value="0" aria-label="Month">
+      </div>
+    </div>
+
+    <!-- worklist -->
+    <div class="card worklist">
+      <div class="wl-head">
+        <h3>Field worklist</h3>
+        <span class="count" id="patchCountBadge">—</span>
+      </div>
+      <p class="wl-sub">Contiguous patches ranked by area in feddans.</p>
+
+      <div id="patchList" class="patch-list" role="listbox" aria-label="Ranked patches"></div>
+
+      <div class="detail">
+        <div class="detail-head">
+          <h4 id="selPatchTitle">—</h4>
+          <button class="btn btn-alert btn-small" id="fieldOrderBtn" type="button">Field order ↗</button>
+        </div>
+        <div id="unitBody" class="rows"></div>
+        <canvas id="trendChart" aria-label="Twelve month observed versus forecast for the selected patch"></canvas>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== 02 · TRY MODEL ============================== -->
+<section id="trymodel" class="try">
+  <header class="sec-head">
+    <div class="sec-num">02</div>
+    <div>
+      <h2>Try the model</h2>
+      <p class="sec-deck">
+        This is the live inference path, not a recording. Pick a patch, run Prithvi-EO on the
+        Hugging Face Space, and the result is written straight back into the map above.
+      </p>
+    </div>
+  </header>
+
+  <div class="try-grid">
+
+    <!-- control panel -->
+    <div class="card try-panel">
+      <div class="try-model">
+        <div class="tm-name">Prithvi-EO-2.0-300M-TL</div>
+        <div class="tm-meta mono">frozen backbone · fine-tuned U-Net head · 30 m · HLS L30/S30</div>
+      </div>
+
+      <div class="try-controls">
+        <label class="field">
+          <span>Patch</span>
+          <select id="tmPatchSelect"></select>
+        </label>
+        <label class="field">
+          <span>Target month</span>
+          <select id="tmMonthSelect"></select>
+        </label>
+      </div>
+
+      <button class="btn btn-primary btn-run" id="runModelBtn" type="button">
+        <span class="rm-icon" aria-hidden="true">▶</span>
+        <span class="rm-label">Run inference</span>
+      </button>
+
+      <div class="rm-progress" id="runModelProgress" hidden>
+        <div class="rm-bar"><div class="rm-fill" id="runModelProgressFill"></div></div>
+        <div class="rm-label-line">
+          <span id="runModelProgressLabel">Queued…</span>
+          <span class="mono" id="runModelEta"></span>
+        </div>
+      </div>
+
+      <div class="rm-stages" id="runModelStages" aria-hidden="true">
+        <span data-rmstage="queued">Queued</span>
+        <span data-rmstage="loading_model">Loading weights</span>
+        <span data-rmstage="preprocessing">4-month stack</span>
+        <span data-rmstage="running_inference">Forward pass</span>
+        <span data-rmstage="postprocessing">Post-process</span>
+      </div>
+
+      <div class="rm-result" id="runModelResultBadge" hidden></div>
+
+      <p class="rm-note">
+        Cold CPU start takes 60–90 s; the Space is pre-warmed before demos and repeat tiles return
+        cached. If the Space is unreachable the panel falls back to the cached pipeline result and
+        says so.
+      </p>
+    </div>
+
+    <!-- compute view -->
+    <div class="card try-view">
+      <div class="tv-head">
+        <span>Input window → forecast</span>
+        <span class="mono" id="tvDevice">device —</span>
+      </div>
+
+      <div class="tv-strip">
+        <div class="tv-inputs" id="tvInputs"></div>
+        <div class="tv-arrow" aria-hidden="true">→</div>
+        <div class="tv-output">
+          <canvas id="tvOutput" width="180" height="180"></canvas>
+          <span>forecast +1 month</span>
+        </div>
+      </div>
+
+      <div class="tv-log" id="tvLog" aria-live="polite">
+        <div class="tl-empty">No run yet. Pick a patch and press run — the pipeline streams its stage here.</div>
+      </div>
+
+      <button class="btn btn-ghost btn-small" id="tvJumpBtn" type="button" hidden>Show on map ↑</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== 03 · EVIDENCE ROOM ============================== -->
+<div class="bridge" aria-hidden="true">
+  <span>03 · Scientific audit</span>
+</div>
+
+<section id="deepdive" class="evidence">
+  <header class="sec-head light">
+    <div class="sec-num">03</div>
+    <div>
+      <h2>Evidence Room</h2>
+      <p class="sec-deck">
+        Held-out evaluation, a field-audited error budget, and the 25-year Delta trajectory.
+        Everything here failed somewhere — that is what makes the rest of it usable.
+      </p>
+    </div>
+  </header>
+
+  <div class="tabbar" role="tablist">
+    <button data-tab="audit" aria-selected="true">What we got wrong</button>
+    <button data-tab="validation" aria-selected="false">Model validation</button>
+    <button data-tab="data" aria-selected="false">Data &amp; limits</button>
+  </div>
+
+  <div class="ev-panels">
+    <div class="ev-panel" id="p-audit" role="tabpanel"></div>
+    <div class="ev-panel" id="p-validation" role="tabpanel" hidden></div>
+    <div class="ev-panel" id="p-data" role="tabpanel" hidden></div>
+  </div>
+
+  <footer class="credits">
+    <span>NASA HLS · Prithvi-EO-2.0 (NASA/IBM) · AppEEARS · MODIS MOD13Q1</span>
+    <span>NASA Space Apps Challenge 2026 · Cairo</span>
+  </footer>
+</section>
+
+<!-- ============================== PRINT MODAL ============================== -->
+<div class="print-modal" id="printModal" hidden role="dialog" aria-modal="true" aria-labelledby="printModalTitle">
+  <div class="pm-backdrop" id="closePrintBackdrop"></div>
+  <div class="pm-window">
+    <div class="pm-toolbar">
+      <span id="printModalTitle">Field inspection order</span>
+      <div>
+        <button class="btn btn-primary btn-small" id="triggerPrintBtn" type="button">Print / Save PDF</button>
+        <button class="btn btn-ghost btn-small" id="closePrintBtn" type="button">Close</button>
+      </div>
+    </div>
+    <div class="pm-scroll">
+      <div id="printSheet"></div>
+    </div>
+  </div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/data.js"></script>
+<script src="js/map.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/field-order.js"></script>
+<script src="js/run-model.js"></script>
+<script src="js/stars.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

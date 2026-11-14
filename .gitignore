@@ -1,0 +1,57 @@
+﻿# ==========================================
+# 1. Python & Virtual Environments
+# ==========================================
+venv/
+.venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# ==========================================
+# 2. Machine Learning Models & Weights
+# ==========================================
+models/
+*.pt
+*.pth
+*.bin
+*.onnx
+*.safetensors
+
+# ==========================================
+# 3. Raw & Processed Satellite Data (Huge Files)
+# ==========================================
+data/raw/
+data/processed/
+*.nc
+*.tif
+*.tiff
+*.parquet
+*.hdf
+*.h5
+
+# ==========================================
+# 4. Frontend Large Assets (LFS Exceeded)
+# ==========================================
+# We only block the 10MB JSON and the large image. 
+# This keeps your small results.json/trend.json safe!
+dashboard_data.json
+aoi_base.png
+
+# ==========================================
+# 5. Secrets & API Tokens (CRITICAL)
+# ==========================================
+cookies.txt
+.env
+*.env
+.secret
+*.token
+
+# ==========================================
+# 6. OS & Editor Specific Files
+# ==========================================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

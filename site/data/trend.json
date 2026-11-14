@@ -1,0 +1,7 @@
+{
+  "method": "Seasonal Mann-Kendall + FDR",
+  "alpha": 0.05,
+  "decline_pct": 0.04,
+  "increase_pct": 78.57,
+  "none_pct": 21.39
+}

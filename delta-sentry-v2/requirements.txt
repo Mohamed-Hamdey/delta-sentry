@@ -1,0 +1,7 @@
+# requirements.txt
+spaces>=0.30.0
+gradio>=6.0.0
+numpy==1.26.4
+rasterio==1.3.10
+# Add any other pure-python dependencies your inference code needs (e.g., timm, transformers)
+# Do NOT add torch here. ZeroGPU provides a compatible CUDA build.

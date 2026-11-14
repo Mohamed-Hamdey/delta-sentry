@@ -1,0 +1,35 @@
+# Core Data Science & Math
+numpy==1.26.4
+pandas>=2.0.0
+scipy>=1.10.0
+scikit-learn>=1.3.0
+pyarrow==20.0.0
+
+# Geospatial & NetCDF Handling
+xarray>=2023.1.0
+netCDF4>=1.6.0
+rioxarray>=0.15.0
+rasterio>=1.3.0
+pyproj>=3.5.0
+geopandas>=0.14.0
+
+# Machine Learning (PyTorch is installed separately via pip for CUDA, but listed here for reference)
+torch==2.6.0
+torchvision==0.21.0
+terratorch==1.1.1
+
+# Trend Analysis
+statsmodels>=0.14.0
+pymannkendall>=1.4.3
+
+# NASA Access & Utils
+earthaccess>=0.5.0
+pyyaml>=6.0
+tqdm>=4.65.0
+pytest>=7.0.0
+torch==2.6.0
+numpy==1.26.4
+rasterio==1.3.10
+fastapi==0.110.0
+uvicorn[standard]==0.29.0
+pydantic==2.6.4

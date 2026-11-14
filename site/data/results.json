@@ -1,0 +1,27 @@
+{
+  "baselines": [
+    {
+      "name": "Seasonal Climatology",
+      "mae": 0.1392920835112983,
+      "rmse": 0.1766947788948362
+    },
+    {
+      "name": "Persistence",
+      "mae": 0.1319791791452602,
+      "rmse": 0.1858464877375147
+    },
+    {
+      "name": "Prithvi B3 (Ours)",
+      "mae": 0.1505337489445417,
+      "rmse": 0.1822938208007005
+    }
+  ],
+  "coverage": 0.85,
+  "audit": {
+    "n": 44,
+    "real": 18,
+    "harvest": 12,
+    "artifact": 9,
+    "unclear": 5
+  }
+}

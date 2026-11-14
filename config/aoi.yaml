@@ -1,0 +1,29 @@
+# D-001: AOI selection. D-001 is NOT frozen until P0.7 (HLS coverage + NDVI quicklook).
+# Bboxes are ~10 x 10 km. Format: [min_lon, min_lat, max_lon, max_lat], WGS84.
+
+candidates:
+  A:
+    name: "Beheira (default)"
+    center_lat: 30.61
+    center_lon: 30.43
+    bbox_wgs84: [30.378, 30.565, 30.482, 30.655]
+    reason: >
+      Northern Nile Delta, ~half of Egypt's agricultural land, dense irrigated
+      cropland, clearest Impact/Relevance narrative for judging.
+  B:
+    name: "Dakahlia (backup)"
+    center_lat: 31.00
+    center_lon: 31.30
+    bbox_wgs84: [31.248, 30.955, 31.352, 31.045]
+    reason: "Backup if Beheira HLS cloud gaps exceed threshold."
+
+selection_rule: >
+  In P0.7, count HLS months in 2024 with >= 30% valid pixels for each candidate.
+  Both pass -> choose A. One passes -> choose it. Neither -> widen to 15 x 15 km
+  or drop to one HLS product and log D-001a. Confirm with an NDVI quicklook that
+  the box is cropland, not desert fringe or open water, before freezing D-001.
+
+# Frozen after P0.7 (fill these in):
+selected: "A"          # or "B"
+bbox_wgs84: [30.378, 30.565, 30.482, 30.655]
+crs_utm: "EPSG:32636"  # UTM zone 36N covers the Delta

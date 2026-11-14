@@ -1,0 +1,37 @@
+# HLS band mapping. CRITICAL: NIR_NARROW differs between products.
+# Prithvi-EO-2.0 expects reflectance in DN scale (0-10000), NOT normalized to 0-1.
+
+prithvi_bands: [BLUE, GREEN, RED, NIR_NARROW, SWIR_1, SWIR_2]
+
+products:
+  HLSL30:
+    BLUE:       B02.tif
+    GREEN:      B03.tif
+    RED:        B04.tif
+    NIR_NARROW: B05.tif    # Landsat broad NIR, mapped to Prithvi's narrow slot
+    SWIR_1:     B06.tif
+    SWIR_2:     B07.tif
+    QA:         Fmask.tif
+  HLSS30:
+    BLUE:       B02.tif
+    GREEN:      B03.tif
+    RED:        B04.tif
+    NIR_NARROW: B8A.tif    # Sentinel narrow NIR
+    SWIR_1:     B11.tif
+    SWIR_2:     B12.tif
+    QA:         Fmask.tif
+
+# NDVI is computed from RED and NIR_NARROW:
+#   NDVI = (NIR - RED) / (NIR + RED), on DN values (ratio invariant to scale)
+ndvi:
+  red: RED
+  nir: NIR_NARROW
+
+# Fmask bit meanings (HLS QA, per USGS):
+fmask:
+  clear_land_bit: 6        # bit 6 = clear
+  cloud_bits: [1, 2]       # bits 1-2 = cloud
+  shadow_bit: 3            # bit 3 = cloud shadow
+  snow_bit: 4
+  water_bit: 5
+  keep_mask: 0b01000000    # clear land only
